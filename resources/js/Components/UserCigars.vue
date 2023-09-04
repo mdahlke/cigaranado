@@ -30,7 +30,7 @@ onMounted(() => {
         <UserCigar 
             v-for="cigar in cigars" 
             :key="cigar.id"
-            :cigar="cigar"
+            :userCigar="cigar"
         />
 
     </div>

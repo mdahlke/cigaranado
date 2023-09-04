@@ -26,9 +26,21 @@ use Illuminate\Database\Eloquent\Model;
 class Cigar extends Model
 {
     use HasFactory;
+    
+    protected $table = 'cigars';
 
     public function users()
     {
         return $this->belongsToMany(User::class, 'user_cigar');
+    }
+
+    public function brand()
+    {
+        return $this->belongsTo(CigarBrand::class, 'cigar_brand_id');
+    }
+
+    public function userCigars()
+    {
+        return $this->hasMany(UserCigar::class);
     }
 }

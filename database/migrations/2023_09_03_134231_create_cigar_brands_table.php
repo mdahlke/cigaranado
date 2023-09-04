@@ -13,7 +13,14 @@ return new class extends Migration
     {
         Schema::create('cigar_brands', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('cigar_manufacturer_id')->nullable();
+            $table->string('name')->required();
             $table->timestamps();
+        });
+
+        Schema::table('cigars', function (Blueprint $table) {
+            $table->foreignId('cigar_brand_id')->nullable();
+            $table->dropColumn('brand');
         });
     }
 
@@ -23,5 +30,10 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('cigar_brands');
+
+        Schema::table('cigars', function (Blueprint $table) {
+            $table->dropColumn('cigar_brand_id');
+            $table->string('brand');
+        });
     }
 };

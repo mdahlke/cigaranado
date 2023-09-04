@@ -15,18 +15,21 @@ const app = createInertiaApp({
     title: (title) => `${title} - ${appName}`,
     resolve: (name) => resolvePageComponent(`./Pages/${name}.vue`, import.meta.glob('./Pages/**/*.vue')),
     setup({ el, App, props, plugin }) {
-        const vuetify = createVuetify({ 
-            components, 
+        const vuetify = createVuetify({
+            components,
             directives,
             theme: {
                 defaultTheme: 'dark'
-            } 
+            },
+            icons: {
+                iconfont: 'mdi', // Use the Material Design Icons font
+            },
         });
 
         return createApp({ render: () => h(App, props) })
             .use(plugin)
-            .use(vuetify)
             .use(ZiggyVue, Ziggy)
+            .use(vuetify)
             .mount(el);
     },
     progress: {

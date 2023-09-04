@@ -2,7 +2,7 @@
 import { defineProps } from 'vue'
 
 const props = defineProps({
-    cigar: {
+    userCigar: {
         type: Object,
         required: true,
     },
@@ -11,17 +11,18 @@ const props = defineProps({
 </script>
 
 <template>
-    <div class="user-cigar">
-        <h1>{{ props.cigar.name }}</h1>
-        <p>{{ props.cigar.pivot.rating }}</p>
-    </div>
+    <v-card class="user-cigar"
+        :title="props.userCigar.cigar.name"
+        :subtitle="props.userCigar.cigar.brand.manufacturer.name"
+        :text="'Rating: ' + props.userCigar.rating.toString()" 
+    />
 </template>
 
 <style scoped>
-.user-cigar {
+/* .user-cigar {
     display: grid;
     background: #fff;
     padding: 1rem;
     border-radius: 5px;
-}
+} */
 </style>

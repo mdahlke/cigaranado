@@ -3,9 +3,16 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Eloquent\Model;
 
-class UserCigar extends Pivot
+class UserCigar extends Model
 {
     use HasFactory;
+
+    protected $table = 'user_cigar';
+
+    public function cigar()
+    {
+        return $this->belongsTo(Cigar::class);
+    }
 }

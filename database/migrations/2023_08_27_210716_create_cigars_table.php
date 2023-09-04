@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('brand');
             $table->string('type');
-            $table->string('wrapper');
+            $table->string('wrapper')->nullable();
             $table->string('binder');
             $table->string('filler');
             $table->enum ('strength', ['Mild', 'Medium', 'Full']);

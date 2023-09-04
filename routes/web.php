@@ -3,9 +3,11 @@
 use App\Http\Controllers\CigarsController;
 use App\Http\Controllers\ProfileController;
 use App\Models\Cigar;
+use App\Models\CigarBrand;
 use App\Models\UserCigar;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -26,13 +28,12 @@ Route::get('/', function () {
         'canRegister' => Route::has('register'),
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
-        'cigars' => Cigar::all(),
     ]);
 });
 
 Route::get('/dashboard', function (Request $request) {
     return Inertia::render('Dashboard', [
-        'cigars' => UserCigar::all(),
+        'cigars' => UserCigar::with(['cigar.brand.manufacturer'])->get(),
     ]);
 
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -43,14 +44,46 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::middleware('auth:sanctum')->get('/my/cigars', function (Request $request) {
-    return $request->user()->cigar;
+Route::middleware('auth:sanctum')->group(function(){
+    Route::get('/my/cigars', function (Request $request) {
+        return UserCigar::with(['cigar.brand.manufacturer'])->get();
+    });
+    Route::get('/cigars/rate', function (Request $request) {
+        return Inertia::render('UserCigar/Create', [
+            'cigars' => Cigar::with('brand.manufacturer')->get(),
+        ]);
+    })->name('cigar.rate');
+
+    Route::post('cigar', [CigarsController::class, 'store'])->name('cigars.index');
+
+    Route::get('/cigar/create', function () {
+        return Inertia::render('Cigar/Create');
+    })->name('cigar.create');
+
+    Route::get('/brand/create', function () {
+        return Inertia::render('Brand/Create');
+    })->name('brand.create');
+
+    Route::get('/brands/', function () {
+        return CigarBrand::with('manufacturer')->get();
+    })->name('brands.json.all');
+
+    Route::get('cigar-options', function(){
+        $flavorProfiles = get_enum_options('cigars', 'flavor_profile');
+        $wrappers = get_enum_options('cigars', 'wrapper');
+
+        return [
+            'flavor_profiles' => $flavorProfiles,
+            'wrappers' => $wrappers,
+        ];
+    });
+
 });
 
-Route::get('cigar/create', function () {
-    return Inertia::render('Cigar/Create');
-})->name('cigars.index');
+function get_enum_options($table, $field){
+    $column = DB::select("SHOW COLUMNS FROM `" . $table ."` WHERE Field = '". $field ."'")[0]->Type;
+    $enumValues = substr($column, 6, -2); // Extract the enum values from the type string
+    // dump($column, $enumValues);
 
-Route::post('cigar', [CigarsController::class, 'store'])->name('cigars.index');
-
-require __DIR__.'/auth.php';
+    return explode("','", $enumValues);
+}

@@ -19,7 +19,7 @@ class CigarsController extends Controller
     {
         $cigar = new Cigar();
         $cigar->name = request('name');
-        $cigar->brand = request('brand');
+        $cigar->cigar_brand_id = request('brand_id');
         $cigar->type = request('type');
         $cigar->wrapper = request('wrapper');
         $cigar->origin = request('origin');
