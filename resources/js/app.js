@@ -1,5 +1,6 @@
 import './bootstrap';
 import '../css/app.css';
+import '@mdi/font/css/materialdesignicons.css';
 
 import { createApp, h } from 'vue';
 import { createInertiaApp } from '@inertiajs/vue3';
@@ -8,6 +9,8 @@ import { ZiggyVue } from '../../vendor/tightenco/ziggy/dist/vue.m';
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components';
 import * as directives from 'vuetify/directives';
+import { aliases, fa } from 'vuetify/iconsets/fa'
+import { mdi } from 'vuetify/iconsets/mdi'
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -22,7 +25,12 @@ const app = createInertiaApp({
                 defaultTheme: 'dark'
             },
             icons: {
-                iconfont: 'mdi', // Use the Material Design Icons font
+                defaultSet: 'fa',
+                aliases,
+                sets: {
+                    fa,
+                    mdi,
+                },
             },
         });
 

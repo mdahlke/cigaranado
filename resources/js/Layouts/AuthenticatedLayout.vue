@@ -13,7 +13,7 @@ const items = ref([
     {
         name: 'dashboard',
         title: 'Dashboard',
-        icon: 'mdi-view-dashboard',
+        icon: 'view-dashboard',
         href: '/dashboard',
     },
     {
@@ -49,7 +49,8 @@ defineProps({
                 
                 <v-app-bar-title>Cigaronado</v-app-bar-title>
                 
-                <v-app-bar-nav-icon variant="text" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+                <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+                <v-icon icon="fas fa-plus" />
 
             </v-app-bar>
 
@@ -65,13 +66,13 @@ defineProps({
                         :title="item.title"
                         :href="item.href" 
                         :active="item.name === route().current()"
+                        prepend-icon="home-city"
                     >
                         <template v-slot:append>
-                        <v-btn
-                            size="small"
-                            variant="text"
-                            icon="mdi-menu-down"
-                        ></v-btn>
+                            <v-btn
+                                size="small"
+                                variant="text"
+                            ></v-btn>
                         </template>
                     </v-list-item>
 

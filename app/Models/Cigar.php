@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 /**
  * @property int $id
@@ -26,7 +29,7 @@ use Illuminate\Database\Eloquent\Model;
 class Cigar extends Model
 {
     use HasFactory;
-    
+
     protected $table = 'cigars';
 
     public function users()
@@ -42,5 +45,10 @@ class Cigar extends Model
     public function userCigars()
     {
         return $this->hasMany(UserCigar::class);
+    }
+
+    public function flavorProfile(): BelongsToMany
+    {
+        return $this->belongsToMany(FlavorProfile::class, 'cigar_flavor_profiles');
     }
 }

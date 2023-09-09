@@ -12,8 +12,11 @@ const wrapperOptions = ref([]);
 const binder = ref('Tobacco');
 const filler = ref('Weed');
 const origin = ref('Cuba');
-const strength = ref('Full');
-const flavorProfile = ref('Spicy');
+const strength = ref('Mild');
+const strenthOptions = ref([
+    'Mild', 'Medium', 'Full',
+]);
+const flavorProfile = ref([]);
 const flavorProfileOptions = ref([]);
 const valid = ref(true);
 const snackbar = ref(false);
@@ -21,10 +24,6 @@ const snackbarText = ref('');
 
 onMounted(() => {
     const test = true;
-
-    if(test){
-        // name.set('Test');
-    }
 
     axios.get('/brands/').then(response => {
 
@@ -47,10 +46,16 @@ onMounted(() => {
             return [];
         }
         flavorProfileOptions.value = response.data.flavor_profiles.map(option => {
-            return option;
+            return {
+                title: option.name,
+                value: option.id,
+            };
         })
         wrapperOptions.value = response.data.wrappers.map(option => {
-            return option;
+            return {
+                title: option.name,
+                value: option.id,
+            };
         })
     }).catch(error => {
         console.log(error);
@@ -108,17 +113,17 @@ const typeRules = [
 
 const wrapperRules = [
     v => !!v || 'Wrapper is required',
-    v => v.length >= 3 || 'Wrapper must be at 3 least characters',
+
 ];
 
 const binderRules = [
     v => !!v || 'Binder is required',
-    v => v.length >= 3 || 'Binder must be at 3 least characters',
+
 ];
 
 const fillerRules = [
     v => !!v || 'Filler is required',
-    v => v.length >= 3 || 'Filler must be at 3 least characters',
+
 ];
 
 const originRules = [
@@ -133,7 +138,7 @@ const strengthRules = [
 
 const flavorProfileRules = [
     v => !!v || 'Flavor Profile is required',
-    v => v.length >= 3 || 'Flavor Profile must be at 3 least characters',
+
 ];
 
 </script>
@@ -249,8 +254,9 @@ const flavorProfileRules = [
                                 <v-col
                                     cols="12"
                                 >
-                                    <v-text-field
+                                    <v-autocomplete
                                         v-model="strength"
+                                        :items="strenthOptions"
                                         :rules="strengthRules"
                                         label="Strength"
                                         required
@@ -261,17 +267,17 @@ const flavorProfileRules = [
                                 <v-col
                                     cols="12"
                                 >
-                                    <v-autocomplete
+                                    <v-combobox
                                         v-model="flavorProfile"
                                         :items="flavorProfileOptions"
                                         :rules="flavorProfileRules"
                                         label="Flavor Profile"
                                         required
                                         hide-details
+                                        multiple
+                                        chips
                                     />
                                 </v-col>
-
-
                                 
                             </v-row>
                         </v-container>

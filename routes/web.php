@@ -2,9 +2,12 @@
 
 use App\Http\Controllers\CigarsController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserCigarController;
 use App\Models\Cigar;
 use App\Models\CigarBrand;
+use App\Models\FlavorProfile;
 use App\Models\UserCigar;
+use App\Models\Wrapper;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\DB;
@@ -49,28 +52,41 @@ Route::middleware('auth:sanctum')->group(function(){
         return UserCigar::with(['cigar.brand.manufacturer'])->get();
     });
     Route::get('/cigars/rate', function (Request $request) {
+        // pass cigars back with brand and manufacturer, and flavor profiles
         return Inertia::render('UserCigar/Create', [
-            'cigars' => Cigar::with('brand.manufacturer')->get(),
+            'cigars' => Cigar::with(['brand.manufacturer', 'flavorProfile'])->get()
         ]);
     })->name('cigar.rate');
-
-    Route::post('cigar', [CigarsController::class, 'store'])->name('cigars.index');
-
+    
+    Route::post('cigar/rate', [UserCigarController::class, 'store'])->name('cigar.rate.store');
+    
     Route::get('/cigar/create', function () {
         return Inertia::render('Cigar/Create');
     })->name('cigar.create');
-
+    
     Route::get('/brand/create', function () {
         return Inertia::render('Brand/Create');
     })->name('brand.create');
-
+    
     Route::get('/brands/', function () {
         return CigarBrand::with('manufacturer')->get();
     })->name('brands.json.all');
+    
+    Route::get('/cigars/', function () {
+        return Cigar::with(['brand.manufacturer', 'flavorProfile'])->get();
+    })->name('cigars.json.all');
 
+    Route::post('/cigar/', [CigarsController::class, 'store'])->name('cigar.store');
+
+
+    
+    Route::get('/wrappers/', function () {
+        return Wrapper::orderby('name', 'ASC')->get();
+    })->name('wrappers.json.all');
+    
     Route::get('cigar-options', function(){
-        $flavorProfiles = get_enum_options('cigars', 'flavor_profile');
-        $wrappers = get_enum_options('cigars', 'wrapper');
+        $flavorProfiles = FlavorProfile::orderBy('name', 'ASC')->get(['id', 'name']);
+        $wrappers = Wrapper::orderBy('name', 'ASC')->get(['id', 'name']);
 
         return [
             'flavor_profiles' => $flavorProfiles,

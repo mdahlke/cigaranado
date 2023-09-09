@@ -4,21 +4,10 @@ import { Head } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import { VDatePicker } from 'vuetify/labs/VDatePicker'
 
-const name = ref('');
-/**
- * required
- * integer
- */
+const cigar = ref('');
+const cigarItems = ref([]);
 const rating = ref('');
-/**
- * not required
- * text
- */
 const review = ref('');
-/**
- * not required
- * integer
- */
 const draw = ref('');
 const burn = ref('');
 const flavor = ref('');
@@ -29,9 +18,47 @@ const date = ref('');
 
 const nameRules = [
     v => !!v || 'Name is required',
-    v => v.length <= 10 || 'Name must be at least characters',
+    v => v.length >= 2 || 'Name must be at least characters',
 ];
 
+
+axios.get('/cigars/').then(response => {
+
+    if(response.status !== 200) {
+        return [];
+    }
+    cigarItems.value = response.data.map(cigar => {
+        console.log(cigar);
+        return {
+            title: cigar.name + ' ('+ (cigar.brand?.name || 'unknown') + ' by ' + (cigar.brand?.manufacturer?.name || 'unknown') + ')',
+            value: cigar.id,
+        };
+    });
+    }).catch(error => {
+    console.log(error);
+});
+
+const submit = () => {
+    axios.post('/cigar/rate', {
+        cigar: cigar.value,
+        rating: rating.value,
+        review: review.value,
+        draw: draw.value,
+        burn: burn.value,
+        flavor: flavor.value,
+        body: body.value,
+        location: location.value,
+        image: image.value,
+        date: date.value,
+    })
+    .then(response => {
+        console.log({response});
+        console.log(response.data);
+    })
+    .catch(error => {
+        console.log(error);
+    });
+};
 
 </script>
 
@@ -41,20 +68,21 @@ const nameRules = [
 
         <v-form
             v-model="valid"
-            @submit="submit">
+            @submit.prevent="submit">
             <v-container>
                 <v-row>
                     <v-col
                     cols="12"
                     md="4"
                     >
-                    <v-text-field
-                        v-model="name"
-                        :rules="nameRules"
-                        label="Cigar"
-                        required
-                        hide-details
-                    ></v-text-field>
+                        <v-autocomplete
+                            v-model="cigar"
+                            :items="cigarItems"
+                            :rules="nameRules"
+                            label="Cigar"
+                            required
+                            hide-details
+                        />
                     </v-col>
 
                     <v-col
