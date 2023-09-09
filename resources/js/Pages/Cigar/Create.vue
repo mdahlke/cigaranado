@@ -113,17 +113,14 @@ const typeRules = [
 
 const wrapperRules = [
     v => !!v || 'Wrapper is required',
-
 ];
 
 const binderRules = [
     v => !!v || 'Binder is required',
-
 ];
 
 const fillerRules = [
     v => !!v || 'Filler is required',
-
 ];
 
 const originRules = [
@@ -138,7 +135,6 @@ const strengthRules = [
 
 const flavorProfileRules = [
     v => !!v || 'Flavor Profile is required',
-
 ];
 
 </script>
@@ -218,8 +214,9 @@ const flavorProfileRules = [
                                 <v-col
                                     cols="12"
                                 >
-                                    <v-text-field
+                                    <v-autocomplete
                                         v-model="binder"
+                                        :items="wrapperOptions"
                                         :rules="binderRules"
                                         label="Binder"
                                         required
@@ -230,8 +227,9 @@ const flavorProfileRules = [
                                 <v-col
                                     cols="12"
                                 >
-                                    <v-text-field
+                                    <v-autocomplete
                                         v-model="filler"
+                                        :items="wrapperOptions"
                                         :rules="fillerRules"
                                         label="Filler"
                                         required
