@@ -93,13 +93,11 @@ const submit = () => {
 
 <template>
     <AuthenticatedLayout>
-        <v-icon icon="fas fa-plus" />
-        <v-icon icon="mdi:mdi-home" />
 
         <Head title="Add Cigar" />
 
         <v-form :class="{'working': working}" v-model="valid" @submit.prevent="submit">
-            <v-container>
+            <v-container fluid>
                 <v-row>
                     <v-col cols="12" md="4">
                         <v-autocomplete v-model="cigar" :items="cigarItems" :rules="nameRules" label="Cigar" required
@@ -121,7 +119,7 @@ const submit = () => {
                     <v-col cols="12" md="4">
                         <v-text-field v-model="burn" label="Burn" required hide-details />
                     </v-col>
-                    <!--- i need to populate fields for my remaining refs -->
+
                     <v-col cols="12" md="4">
                         <v-text-field v-model="flavor" label="Flavor" required hide-details />
                     </v-col>
@@ -135,11 +133,12 @@ const submit = () => {
                     </v-col>
 
                     <v-col cols="12" md="4">
-                        <v-text-field v-model="image" label="Image" required hide-details />
-                        <p>image kit field</p>
-                        <image-kit-upload v-model="uploaded" :useUniqueFileName=true :isPrivateFile=true
-                            customCoordinates="10,10,100,100" />
-                        <p>/image kit field</p>
+                        <image-kit-upload 
+                            v-model="uploaded" 
+                            :useUniqueFileName=true 
+                            :isPrivateFile=true
+                            customCoordinates="10,10,100,100" 
+                        />
                     </v-col>
 
                     <v-col cols="12" md="4">
