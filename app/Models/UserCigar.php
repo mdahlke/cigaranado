@@ -15,4 +15,9 @@ class UserCigar extends Model
     {
         return $this->belongsTo(Cigar::class);
     }
+
+    public function images()
+    {
+        return $this->hasMany(UserCigarImage::class);
+    }
 }

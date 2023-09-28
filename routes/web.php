@@ -36,9 +36,8 @@ Route::get('/', function () {
 
 Route::get('/dashboard', function (Request $request) {
     return Inertia::render('Dashboard', [
-        'cigars' => UserCigar::with(['cigar.brand.manufacturer'])->get(),
+        'cigars' => UserCigar::with(['cigar.brand.manufacturer', 'images'])->get(),
     ]);
-
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -47,9 +46,23 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::middleware('auth:sanctum')->group(function(){
+Route::middleware('auth:sanctum')->group(function () {
     Route::get('/my/cigars', function (Request $request) {
-        return UserCigar::with(['cigar.brand.manufacturer'])->get();
+        $subquery = UserCigar::select('cigar_id', DB::raw('avg(rating) as average_rating'), DB::raw('count(*) as total'))
+            ->groupBy('cigar_id');
+
+        $query = UserCigar::joinSub($subquery, 'sub', function ($join) {
+            $join->on('user_cigar.cigar_id', '=', 'sub.cigar_id');
+        })
+            ->join('user_cigar_images', 'user_cigar_images.user_cigar_id', '=', 'user_cigar.id')
+            ->join('cigars', 'cigars.id', '=', 'user_cigar.cigar_id')
+            ->join('cigar_brands', 'cigar_brands.id', '=', 'cigars.cigar_brand_id')
+            ->join('cigar_manufacturers', 'cigar_manufacturers.id', '=', 'cigar_brands.cigar_manufacturer_id')
+            ->select('cigars.name as cigar_name', 'user_cigar.*', 'sub.average_rating', 'sub.total', 'cigar_manufacturers.name as manufacturer_name', 'cigar_brands.name as brand_name', 'user_cigar_images.*')
+            ->groupBy('cigar_id')
+            ->orderBy('user_cigar.created_at', 'desc');
+
+        return $query->get();
     });
     Route::get('/cigars/rate', function (Request $request) {
         // pass cigars back with brand and manufacturer, and flavor profiles
@@ -57,34 +70,32 @@ Route::middleware('auth:sanctum')->group(function(){
             'cigars' => Cigar::with(['brand.manufacturer', 'flavorProfile'])->get()
         ]);
     })->name('cigar.rate');
-    
+
     Route::post('cigar/rate', [UserCigarController::class, 'store'])->name('cigar.rate.store');
-    
+
     Route::get('/cigar/create', function () {
         return Inertia::render('Cigar/Create');
     })->name('cigar.create');
-    
+
     Route::get('/brand/create', function () {
         return Inertia::render('Brand/Create');
     })->name('brand.create');
-    
+
     Route::get('/brands/', function () {
         return CigarBrand::with('manufacturer')->get();
     })->name('brands.json.all');
-    
+
     Route::get('/cigars/', function () {
         return Cigar::with(['brand.manufacturer', 'flavorProfile'])->get();
     })->name('cigars.json.all');
 
     Route::post('/cigar/', [CigarsController::class, 'store'])->name('cigar.store');
 
-
-    
     Route::get('/wrappers/', function () {
         return Wrapper::orderby('name', 'ASC')->get();
     })->name('wrappers.json.all');
-    
-    Route::get('cigar-options', function(){
+
+    Route::get('cigar-options', function () {
         $flavorProfiles = FlavorProfile::orderBy('name', 'ASC')->get(['id', 'name']);
         $wrappers = Wrapper::orderBy('name', 'ASC')->get(['id', 'name']);
 
@@ -94,10 +105,18 @@ Route::middleware('auth:sanctum')->group(function(){
         ];
     });
 
+    Route::get('imagekit-token', function () {
+        /** @var ImageKit\ImageKit $imagekit */
+        $imagekit = app('imagekit');
+        $token = $imagekit->getAuthenticationParameters();
+
+        return $token;
+    });
 });
 
-function get_enum_options($table, $field){
-    $column = DB::select("SHOW COLUMNS FROM `" . $table ."` WHERE Field = '". $field ."'")[0]->Type;
+function get_enum_options($table, $field)
+{
+    $column = DB::select("SHOW COLUMNS FROM `" . $table . "` WHERE Field = '" . $field . "'")[0]->Type;
     $enumValues = substr($column, 6, -2); // Extract the enum values from the type string
     // dump($column, $enumValues);
 

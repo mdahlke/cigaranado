@@ -12,7 +12,6 @@ onMounted(() => {
         // withCredentials: true,
     })
     .then(response => {
-        console.log(response.data);
         cigars.value = response.data;
     })
     .catch(error => {
@@ -22,18 +21,19 @@ onMounted(() => {
 </script>
 
 <template>
-    <h1>Your Cigars</h1>
+    <section class="user-cigars__wrap">
+        <h1>Your Cigars</h1>
+        <div 
+            class="user-cigars"
+        >
+            <UserCigar 
+                v-for="cigar in cigars" 
+                :key="cigar.id"
+                :userCigar="cigar"
+            />
 
-    <div 
-        class="user-cigars"
-    >
-        <UserCigar 
-            v-for="cigar in cigars" 
-            :key="cigar.id"
-            :userCigar="cigar"
-        />
-
-    </div>
+        </div>
+    </section>
 </template>
 
 <style scoped>

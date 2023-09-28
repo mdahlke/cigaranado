@@ -25,7 +25,7 @@ const app = createInertiaApp({
                 defaultTheme: 'dark'
             },
             icons: {
-                defaultSet: 'fa',
+                defaultSet: 'mdi',
                 aliases,
                 sets: {
                     fa,
@@ -45,4 +45,3 @@ const app = createInertiaApp({
     },
 });
 
-// app.use(vuetify);
